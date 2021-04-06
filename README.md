@@ -1,4 +1,7 @@
-# MSiA423 Template Repository
+# Modeling COVID-19 Health Beliefs
+
+Developer: Meghan Hutch 
+QA support: Irene Lai
 
 <!-- toc -->
 
