@@ -1,7 +1,25 @@
 # Modeling COVID-19 Health Beliefs
 
-Developer: Meghan Hutch 
-QA support: Irene Lai
+**Developer**: Meghan Hutch 
+
+**QA support**: Irene Lai
+
+## **Vision**
+
+The COVID-19 pandemic has resulted in an infodemic of information regarding health, science, and public policy. This information not only reflects the public’s perception of our ongoing global health crisis but can also further impact it. Understanding the dynamics of public perception regarding COVID-19 is critical for strategizing policies to manage health. For this reason, we aim to develop a model and supplementary web application that delineates health belief phenotypes regarding perceptions towards COVID-19 susceptibility and severity, and regarding medications like hydroxychloroquine. Moreover, this model aims to explore the trajectory of these phenotypes over the course of the pandemic. If successful, this model can be extensible across other types of social media related content.
+
+## **Mission**
+
+On the backend, we will use an existing dataset of [5,000 COVID-19 related tweets](https://github.com/HanyinWang/CovidHealthBeliefTweets) previously annotated and classified into at least one of five categories: 1) Not related to health belief or related to 2) disease severity, 3) disease susceptibility, 4) benefits or 5) barriers of hydroxychloroquine. Latent Dirichlet Allocation topic modeling will be used on a training subset in order to identify further topics, or phenotypes, of the major aforementioned categories. Moreover, dynamic topic modeling will be tested in order to evaluate whether or not these phenotypes changed over the course of the ensuing pandemic.
+
+Users of our interactive application will be able to view the different phenotypes of health beliefs and their associated tweets. Users can see how closely related these phenotypes are with one another and which words are associated. Furthermore, users can toggle an interactive timeline that will allow them to examine the temporality of health belief phenotypes since the start of the pandemic.  
+
+## **Success Criteria**
+
+Model performance will first be evaluated using a topic coherence metric such as UCI which uses point wise mutual information (PMI) and the cosine distance to help assess the semantic similarity between words that fall within the same topic. Such a method can also be used to evaluate the optimal number of topics by identifying which number of topics provides the overall highest coherence. As the tweets in our dataset are all COVID-19 related and have previously been queried to try and identify health related topics, a minimum coherence score of 0.7 is expected. Moreover, once we identify the optimal number of topics, we can label each topic as belonging to one of the major 5 categories of health beliefs. Then we will employ supervised classification in order to test how well unseen tweets will classify into a topic matching its label.
+
+The larger purpose of this application is to help support public awareness of changes in perception of our ensuing pandemic. Thus, widespread engagement with the app can be used to assess how well the application is achieving public outreach. Moreover, the success of the application can also be determined by quantifying how well the application continues to identify health belief phenotypes as updates regarding our understanding and management of COIVD-19 continues to development.
+
 
 <!-- toc -->
 
