@@ -84,7 +84,7 @@ The larger purpose of this application is to help support public awareness of ch
 ├── requirements.txt                  <- Python package dependencies 
 ```
 
-## Running the app (to edit)
+## Running the app (to edit once project started)
 
 ### 1. Initialize the database 
 
