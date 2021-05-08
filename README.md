@@ -47,6 +47,7 @@ The larger purpose of this application is to help support public awareness of ch
 │   ├── flaskconfig.py                <- Configurations for Flask API 
 │
 ├── data                              <- Folder that contains data used or generated. Only the external/ and sample/ subdirectories are tracked by git. 
+│   ├── external/                     <- External data sources, usually reference data,  will be synced with git
 │   ├── sample/                       <- Sample data used for code development and testing, will be synced with git
 │
 ├── deliverables/                     <- Any white papers, presentations, final work products that are presented or delivered to a stakeholder 
