@@ -99,12 +99,8 @@ docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY msia423 s3_upload.py --
 
 ### 3. Generate database table
 
-The following docker command generates a table for future storage of our data. Before running the docker command, please ensure that MYSQL login information has is accessible in your local environment by running: 
+The following docker command generates a table for future storage of our data. 
 
 ```bash
-source .mysqlconfig
-```
-
-```bash
-docker run msia423 run.py
+docker run -e MYSQL_USER -e MYSQL_PASSWORD -e MYSQL_HOST -e MYSQL_PORT -e DATABASE_NAME msia423 run.py
 ```
