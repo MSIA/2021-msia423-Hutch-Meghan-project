@@ -30,15 +30,15 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 # add a fake tweet to our database as an example
-tweet = tweets(read_tweet_id=1103,
-                created_at = "1900-01-01",
-                user_location_id = 999, 
-                coordinates = "long:123",
-                place = "Boston,MA",
-                read_text_clean2 = "fake tweet",
-                Perceived_susceptibility = 999,
-                Perceived_severity = 999,
-                Perceived_benefits = 999,
-                Perceived_barriers = 999)  
+tweet = tweets(read_tweet_id=0,
+                created_at="1900-01-01",
+                user_location_id=999, 
+                coordinates="long:123",
+                place="Boston,MA",
+                read_text_clean2="fake tweet",
+                Perceived_susceptibility=999,
+                Perceived_severity=999,
+                Perceived_benefits=999,
+                Perceived_barriers=999)  
 session.add(tweet)
 print(session.commit())

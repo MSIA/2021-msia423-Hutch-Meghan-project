@@ -34,6 +34,10 @@ class tweets(Base):
     
     logger.debug("Create table and columns for raw data.")
     logger.info("Database table created.")
+    if read_tweet_id == 0:
+        logger.error("'read_tweet_id' must be an integer > 0.")
+    raise TypeError("'read_tweet_id' must be an integer > 0.")
+    
 
 def create_db(engine_string: str) -> None:
     """Create database from provided engine string
@@ -47,4 +51,6 @@ def create_db(engine_string: str) -> None:
     engine = sqlalchemy.create_engine(engine_string)
 
     Base.metadata.create_all(engine)
+    logger.debug("Attempting to create database from engine string.")
     logger.info("Database created.")
+        
