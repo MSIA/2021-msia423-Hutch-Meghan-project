@@ -1,7 +1,6 @@
 import boto3
 
 # configure logging
-#import logging.config
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
 
