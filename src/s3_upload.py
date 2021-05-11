@@ -1,7 +1,13 @@
 import boto3
 
-# use boto3 to upload annotated tweets to S3 bucket
+# configure logging
+#import logging.config
+logger = logging.getLogger(__name__)
+logger.setLevel("INFO")
 
+Base = declarative_base()
+
+# use boto3 to upload annotated tweets to S3 bucket
 boto3.set_stream_logger('botocore', level='DEBUG')
 s3 = boto3.resource("s3")
 bucket = s3.Bucket("2021-msia423-hutch-meghan")

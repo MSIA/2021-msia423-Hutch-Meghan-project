@@ -1,20 +1,20 @@
-import logging.config
-
 import sqlalchemy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, MetaData
 from sqlalchemy.orm import sessionmaker
 from flask_sqlalchemy import SQLAlchemy
+import logging.config
 
+# configure logger
 logger = logging.getLogger(__name__)
-logger.setLevel("INFO")
+logger.setLevel("DEBUG")
 
 Base = declarative_base()
 
-# code addapted from Michael Fedell's SQLAchemy tutorial: https://github.com/MSIA/423-sqlalchemy-lab-activity
+# code adapted from Michael Fedell's SQLAchemy tutorial: https://github.com/MSIA/423-sqlalchemy-lab-activity
+
 class tweets(Base):
-    """Create a data model for the database to store annotated tweets
-    """
+    """Create a data model for the database to store annotated tweets"""
 
     __tablename__ = 'tweets'
 
@@ -31,7 +31,9 @@ class tweets(Base):
 
     def __repr__(self):
         return '<tweet %r>' % self.read_text_clean2
-
+    
+    logger.debug("Create table and columns for raw data.")
+    logger.info("Database table created.")
 
 def create_db(engine_string: str) -> None:
     """Create database from provided engine string
