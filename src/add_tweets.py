@@ -14,7 +14,7 @@ Base = declarative_base()
 # code adapted from Michael Fedell's SQLAchemy tutorial: https://github.com/MSIA/423-sqlalchemy-lab-activity
 
 class tweets(Base):
-    """Create a data model for the database to store annotated tweets"""
+    """Create a data model for the database to store annotated tweets."""
 
     __tablename__ = 'tweets'
 
@@ -36,12 +36,12 @@ class tweets(Base):
     logger.info("Database table created.")
 
 def create_db(engine_string: str) -> None:
-    """Create database from provided engine string
+    """Create database from provided engine string.
 
     Args:
-        engine_string: str - Engine string
+        engine_string: str - Engine string.
 
-    Returns: None
+    Returns: None.
 
     """
     engine = sqlalchemy.create_engine(engine_string)
