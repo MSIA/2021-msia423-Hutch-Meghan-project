@@ -1,4 +1,5 @@
 import boto3
+import logging.config
 
 # configure logging
 logger = logging.getLogger(__name__)
