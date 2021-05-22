@@ -10,13 +10,13 @@ The COVID-19 pandemic has resulted in an infodemic of information regarding heal
 
 ## **Mission**
 
-On the backend, we will use an existing dataset of [5,000 COVID-19 related tweets](https://github.com/HanyinWang/CovidHealthBeliefTweets) previously annotated and classified into at least one of five categories: 1) Not related to health belief or related to 2) disease severity, 3) disease susceptibility, 4) benefits or 5) barriers of hydroxychloroquine. Latent Dirichlet Allocation topic modeling will be used on a training subset in order to identify further topics, or phenotypes, of the major aforementioned categories. Moreover, dynamic topic modeling will be tested in order to evaluate whether or not these phenotypes changed over the course of the ensuing pandemic.
+On the backend, we will use an existing dataset of [> 5,000,000 COVID-19 related tweets](https://github.com/HanyinWang/CovidHealthBeliefTweets) previously classified into at least one of five categories: 1) Not related to health belief or related to 2) disease severity, 3) disease susceptibility, 4) benefits or 5) barriers of hydroxychloroquine. Latent Dirichlet Allocation topic modeling will be employed on the annotated tweets in order to identify sub-topics (to be referred to as phenotypes) of the aforementioned categories. 
 
-Users of our interactive application will be able to view the different phenotypes of health beliefs and their associated tweets. Users can see how closely related these phenotypes are with one another and which words are associated. Furthermore, users can toggle an interactive timeline that will allow them to examine the temporality of health belief phenotypes since the start of the pandemic.  
+Users of our application will be able to toggle an interactive timeline to examine the identified phenotypes at different time points since the start of the pandemic. Depending on the selected timeframe of interest, the topic model will only run on tweets written during that timeframe. Additionally, the app will include visuals to allow users to see how closely related phenotypes are with one another and which words are associated. The dynamic nature of the application will allow users and researchers to better evaluate the temporality of COVID-19 health belief phenotypes.
 
 ## **Success Criteria**
 
-Model performance will first be evaluated using a topic coherence metric such as UCI which uses point wise mutual information (PMI) and the cosine distance to help assess the semantic similarity between words that fall within the same topic. Such a method can also be used to evaluate the optimal number of topics by identifying which number of topics provides the overall highest coherence. As the tweets in our dataset are all COVID-19 related and have previously been queried to try and identify health related topics, a minimum coherence score of 0.7 is expected. Moreover, once we identify the optimal number of topics, we can label each topic as belonging to one of the major 5 categories of health beliefs. Then we will employ supervised classification in order to test how well unseen tweets will classify into a topic matching its label.
+Model performance will be evaluated using a topic coherence metric such as UCI which uses point wise mutual information (PMI) and the cosine distance to help assess the semantic similarity between words that fall within the same topic. Such a method can also be used to evaluate the optimal number of topics by identifying which number of topics provides the overall highest coherence. As the tweets in our dataset are all COVID-19 related and have previously been queried to try and identify health related topics, a minimum coherence score of 0.7 is expected. Moreover, once we identify the optimal number of topics, we can label each topic as belonging to one of the major 5 categories of health beliefs. Then we will employ supervised classification in order to test how well unseen tweets will classify into a topic matching its label.
 
 The larger purpose of this application is to help support public awareness of changes in perception of our ensuing pandemic. Thus, widespread engagement with the app, as determined by number of page views, can be used to assess how well the application is achieving public outreach. Moreover, the success of the application can also be determined by quantifying how well the application continues to identify health belief phenotypes as updates regarding our understanding and management of COIVD-19 continues to development.
 
@@ -24,19 +24,10 @@ The larger purpose of this application is to help support public awareness of ch
 <!-- toc -->
 
 - [Directory structure](#directory-structure)
-- [Running the app](#running-the-app)
-  * [1. Initialize the database](#1-initialize-the-database)
-    + [Create the database with a single song](#create-the-database-with-a-single-song)
-    + [Adding additional songs](#adding-additional-songs)
-    + [Defining your engine string](#defining-your-engine-string)
-      - [Local SQLite database](#local-sqlite-database)
-  * [2. Configure Flask app](#2-configure-flask-app)
-  * [3. Run the Flask app](#3-run-the-flask-app)
-- [Running the app in Docker](#running-the-app-in-docker)
-  * [1. Build the image](#1-build-the-image)
-  * [2. Run the container](#2-run-the-container)
-  * [3. Kill the container](#3-kill-the-container)
-  * [Workaround for potential Docker problem for Windows.](#workaround-for-potential-docker-problem-for-windows)
+- [Intializing the Project](#running-the-app)
+  * [1. Build the Image](#1-build-the-image)
+  * [2. Upload data into S3](#2-upload-data-into-s3)
+  * [3. Generate database table](#3-generate_database-table)
 
 <!-- tocstop -->
 
@@ -84,143 +75,94 @@ The larger purpose of this application is to help support public awareness of ch
 ├── requirements.txt                  <- Python package dependencies 
 ```
 
-## Running the app
-### 1. Initialize the database 
+## Intializing the Project
 
-#### Create the database 
-To create the database in the location configured in `config.py` run: 
+### 1. Build the Image 
 
-`python run.py create_db --engine_string=<engine_string>`
+The Dockerfile for running uploading data to S3 and for building the database table is found in the `root` of the directory. This command builds the Docker image, with the tag `msia423`, based on the instructions in `Dockerfile` and the files existing in this repo
 
-By default, `python run.py create_db` creates a database at `sqlite:///data/tracks.db`.
-
-#### Adding songs 
-To add songs to the database:
-
-`python run.py ingest --engine_string=<engine_string> --artist=<ARTIST> --title=<TITLE> --album=<ALBUM>`
-
-By default, `python run.py ingest` adds *Minor Cause* by Emancipator to the SQLite database located in `sqlite:///data/tracks.db`.
-
-#### Defining your engine string 
-A SQLAlchemy database connection is defined by a string with the following format:
-
-`dialect+driver://username:password@host:port/database`
-
-The `+dialect` is optional and if not provided, a default is used. For a more detailed description of what `dialect` and `driver` are and how a connection is made, you can see the documentation [here](https://docs.sqlalchemy.org/en/13/core/engines.html). We will cover SQLAlchemy and connection strings in the SQLAlchemy lab session on 
-##### Local SQLite database 
-
-A local SQLite database can be created for development and local testing. It does not require a username or password and replaces the host and port with the path to the database file: 
-
-```python
-engine_string='sqlite:///data/tracks.db'
-
-```
-
-The three `///` denote that it is a relative path to where the code is being run (which is from the root of this directory).
-
-You can also define the absolute path with four `////`, for example:
-
-```python
-engine_string = 'sqlite://///Users/cmawer/Repos/2020-MSIA423-template-repository/data/tracks.db'
-```
-
-
-### 2. Configure Flask app 
-
-`config/flaskconfig.py` holds the configurations for the Flask app. It includes the following configurations:
-
-```python
-DEBUG = True  # Keep True for debugging, change to False when moving to production 
-LOGGING_CONFIG = "config/logging/local.conf"  # Path to file that configures Python logger
-HOST = "0.0.0.0" # the host that is running the app. 0.0.0.0 when running locally 
-PORT = 5000  # What port to expose app on. Must be the same as the port exposed in app/Dockerfile 
-SQLALCHEMY_DATABASE_URI = 'sqlite:///data/tracks.db'  # URI (engine string) for database that contains tracks
-APP_NAME = "penny-lane"
-SQLALCHEMY_TRACK_MODIFICATIONS = True 
-SQLALCHEMY_ECHO = False  # If true, SQL for queries made will be printed
-MAX_ROWS_SHOW = 100 # Limits the number of rows returned from the database 
-```
-
-### 3. Run the Flask app 
-
-To run the Flask app, run: 
+To build the image, run from this directory (the root of the repo): 
 
 ```bash
-python app.py
+ docker build -t msia423 .
 ```
 
-You should now be able to access the app at http://0.0.0.0:5000/ in your browser.
+### 2. Upload data into S3
 
-## Running the app in Docker 
+The data used in this project has been generated by the [Luo Lab at Northwestern University](https://labs.feinberg.northwestern.edu/lyg/) and methods are detailed in this [recent manuscript by Wang et al 2021](https://pubmed.ncbi.nlm.nih.gov/33529155/). Due to the large nature of the dataset, a sample of 100 tweets have been uploaded to 'data/sample/tweets.csv'. 
 
-### 1. Build the image 
+The following docker command uploads the sample data into a user's S3 Bucket. Please ensure that you have set AWS credentials as environment variables in your terminal. This can be performed by creating a text file **s3configs.txt** which contains:
 
-The Dockerfile for running the flask app is in the `app/` folder. To build the image, run from this directory (the root of the repo): 
-
-```bash
- docker build -f app/Dockerfile -t pennylane .
+```
+xport AWS_ACCESS_KEY_ID="YOUR ACCESS KEY"
+export AWS_SECRET_ACCESS_KEY="YOUR SECRET KEY"
+export AWS_DEFAULT_REGION="us-east-1"
 ```
 
-This command builds the Docker image, with the tag `pennylane`, based on the instructions in `app/Dockerfile` and the files existing in this directory.
- 
-### 2. Run the container 
+Import AWS credentials by running:
 
-To run the app, run from this directory: 
-
-```bash
-docker run -p 5000:5000 --name test pennylane
 ```
-You should now be able to access the app at http://0.0.0.0:5000/ in your browser.
-
-This command runs the `pennylane` image as a container named `test` and forwards the port 5000 from container to your laptop so that you can access the flask app exposed through that port. 
-
-If `PORT` in `config/flaskconfig.py` is changed, this port should be changed accordingly (as should the `EXPOSE 5000` line in `app/Dockerfile`)
-
-### 3. Kill the container 
-
-Once finished with the app, you will need to kill the container. To do so: 
-
-```bash
-docker kill test 
+source s3configs.txt
 ```
 
-where `test` is the name given in the `docker run` command.
-
-### Example using `python3` as an entry point
-
-We have included another example of a Dockerfile, `app/Dockerfile_python` that has `python3` as the entry point such that when you run the image as a container, the command `python3` is run, followed by the arguments given in the `docker run` command after the image name. 
-
-To build this image: 
+Additionally, ensure that you enter your "LASTNAME" and "FIRSTNAME" in the indicated line of code:
 
 ```bash
- docker build -f app/Dockerfile_python -t pennylane .
+docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY msia423 s3_upload.py --s3path='s3://2021-msia423-<ENTER-LASTNAME>-<ENTER FIRSTNAME>/tweets.csv'
 ```
 
-then run the `docker run` command: 
+### 3. Generate database table
+
+Import mysql configurations which should contain your  MYSQL_USER, MYSQL_PASSWORD, MYSQL_HOST, and MYSQL_PORT. Use DATABASE_NAME="msia423_db" to follow along with the following directions
 
 ```bash
-docker run -p 5000:5000 --name test pennylane app.py
+source .mysqlconfig
 ```
 
-The new image defines the entry point command as `python3`. Building the sample PennyLane image this way will require initializing the database prior to building the image so that it is copied over, rather than created when the container is run. Therefore, please **do the step [Create the database with a single song](#create-the-database-with-a-single-song) above before building the image**.
-
-# Testing
-
-From within the Docker container, the following command should work to run unit tests when run from the root of the repository: 
+The following docker command generates a table for future storage of our data. 
 
 ```bash
-python -m pytest
-``` 
-
-Using Docker, run the following, if the image has not been built yet:
-
-```bash
- docker build -f app/Dockerfile_python -t pennylane .
+docker run -e MYSQL_USER -e MYSQL_PASSWORD -e MYSQL_HOST -e MYSQL_PORT -e DATABASE_NAME msia423 run.py create_db
 ```
 
-To run the tests, run: 
+## 4. View mysql table
+
+Upon running the docker command to create the mysql table, view the mysql container as follows:
 
 ```bash
- docker run penny -m pytest
+docker run -it --rm \ mysql:5.7.33 \ mysql \ -h$MYSQL_HOST \ -u$MYSQL_USER \ -p$MYSQL_PASSWORD
 ```
- 
+
+***Note: If you're using windows, append `winpty` to the followign command:***
+
+```bash
+winpty docker run -it --rm \ mysql:5.7.33 \ mysql \ -h$MYSQL_HOST \ -u$MYSQL_USER \ -p$MYSQL_PASSWORD
+```
+
+**View mysql table:**
+
+```bash
+show databases;
+```
+
+**Use msia423_db:**
+
+```bash
+use msia423_db;
+```
+
+**View table:**
+
+```bash
+SELECT * from tweets;
+```
+
+**Show columns in table:**
+
+```bash
+SHOW COLUMNS FROM tweets;
+```
+
+
+
+

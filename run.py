@@ -1,41 +1,56 @@
+import os
 import argparse
-
+import re
+import sqlalchemy
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String, MetaData
+from sqlalchemy.orm import sessionmaker
+from flask_sqlalchemy import SQLAlchemy
 import logging.config
+
+# configure logging
 logging.config.fileConfig('config/logging/local.conf')
-logger = logging.getLogger('penny-lane-pipeline')
 
-from src.add_songs import TrackManager, create_db
-from config.flaskconfig import SQLALCHEMY_DATABASE_URI
+from src.add_tweets import create_db, tweets
+from src.s3_upload import parse_s3, connect_s3
 
-if __name__ == '__main__':
+#connect_type = os.getenv("connect_type")
+#s3path = os.getenv("s3path")
+#local_path = os.getenv("local_path")
 
-    # Add parsers for both creating a database and adding songs to it
-    parser = argparse.ArgumentParser(description="Create and/or add data to database")
-    subparsers = parser.add_subparsers(dest='subparser_name')
+#connect_s3(connect_type = "download", s3path = "s3://2021-msia423-hutch-meghan/data/sample_tweets.csv", local_path = "data/tweet.csv")
 
-    # Sub-parser for creating a database
-    sb_create = subparsers.add_parser("create_db", description="Create database")
-    sb_create.add_argument("--engine_string", default=SQLALCHEMY_DATABASE_URI,
-                           help="SQLAlchemy connection URI for database")
+# define variables to connect to mysql
+conn_type = "mysql+pymysql"
+user = os.getenv("MYSQL_USER")
+password = os.getenv("MYSQL_PASSWORD")
+host = os.getenv("MYSQL_HOST")
+port = os.getenv("MYSQL_PORT")
+db_name = os.getenv("DATABASE_NAME")
 
-    # Sub-parser for ingesting new data
-    sb_ingest = subparsers.add_parser("ingest", description="Add data to database")
-    sb_ingest.add_argument("--artist", default="Emancipator", help="Artist of song to be added")
-    sb_ingest.add_argument("--title", default="Minor Cause", help="Title of song to be added")
-    sb_ingest.add_argument("--album", default="Dusk to Dawn", help="Album of song being added")
-    sb_ingest.add_argument("--engine_string", default='sqlite:///data/tracks.db',
-                           help="SQLAlchemy connection URI for database")
+# connect to mysql database
+engine_string = f"{conn_type}://{user}:{password}@{host}:{port}/{db_name}"
+engine = sqlalchemy.create_engine(engine_string)
 
-    args = parser.parse_args()
-    sp_used = args.subparser_name
-    if sp_used == 'create_db':
-        create_db(args.engine_string)
-    elif sp_used == 'ingest':
-        tm = TrackManager(engine_string=args.engine_string)
-        tm.add_track(args.title, args.artist, args.album)
-        tm.close()
-    else:
-        parser.print_help()
+# create database for storing raw data
+create_db(engine_string)
+
+Session = sessionmaker(bind=engine)  
+session = Session()
+
+# add a fake tweet to our database as an example
+tweet = tweets(read_tweet_id=2,
+                created_at="1900-01-01",
+                user_location_id=999, 
+                coordinates="long:123",
+                place="Boston,MA",
+                read_text_clean2="fake tweet",
+                Perceived_susceptibility=999,
+                Perceived_severity=999,
+                Perceived_benefits=999,
+                Perceived_barriers=999)  
+session.add(tweet)
+print(session.commit())
 
 
-
+            

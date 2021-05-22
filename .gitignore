@@ -6,10 +6,11 @@ __pycache__/
 .idea/
 .log
 .ipynb_checkpoints/
-
+.mysqlconfig
+s3config.txt
+.R
 
 data/*
 !data/sample/
-!data/external/
 config/local
 !.gitkeep
