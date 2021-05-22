@@ -102,5 +102,5 @@ docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY msia423 s3_upload.py --
 The following docker command generates a table for future storage of our data. 
 
 ```bash
-docker run -e MYSQL_USER -e MYSQL_PASSWORD -e MYSQL_HOST -e MYSQL_PORT -e DATABASE_NAME msia423 run.py
+docker run -e MYSQL_USER -e MYSQL_PASSWORD -e MYSQL_HOST -e MYSQL_PORT -e DATABASE_NAME msia423 run.py create_db
 ```
