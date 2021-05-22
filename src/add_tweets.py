@@ -31,9 +31,6 @@ class tweets(Base):
 
     def __repr__(self):
         return '<tweet %r>' % self.read_text_clean2
-    
-    logger.debug("Create table and columns for raw data.")
-    logger.info("Database table created.")
 
 def create_db(engine_string: str) -> None:
     """Create database from provided engine string.
@@ -44,6 +41,7 @@ def create_db(engine_string: str) -> None:
     Returns: None.
 
     """
+    logger.debug("Create table and columns for raw data.")
     engine = sqlalchemy.create_engine(engine_string)
 
     Base.metadata.create_all(engine)
