@@ -1,6 +1,9 @@
+import argparse
+
 import boto3
 import botocore
 import re
+#import pandas as pd
 import logging.config
 
 # configure logging
@@ -27,9 +30,9 @@ def parse_s3(s3path):
 
     m = re.match(regex, s3path)
     s3bucket = m.group(1)
-    s3path = m.group(2)
+    s3_local_path = m.group(2)
 
-    return s3bucket, s3path
+    return s3bucket, s3_local_path
 
 def connect_s3(connect_type, s3path, local_path):
     """Connect to S3 bucket to upload or download data.
@@ -45,16 +48,16 @@ def connect_s3(connect_type, s3path, local_path):
     
     if connect_type == 'upload':
         
-        s3bucket, s3_just_path = parse_s3(s3path)
+        s3bucket, s3_local_path = parse_s3(s3path)
         s3 = boto3.resource("s3")
         logger.debug('Connect to S3 Bucket')
         bucket = s3.Bucket(s3bucket)
-        bucket.upload_file("data/sample/tweets.csv", "data/sample_tweets.csv")
+        bucket.upload_file("data/sample/tweets.csv", s3_local_path)
         logger.info('Data uploaded to S3 bucket.')
     
     elif connect_type == 'download':
         
-        s3bucket, s3_just_path = parse_s3(s3path)
+        s3bucket, s3_local_path = parse_s3(s3path)
         s3 = boto3.resource("s3")
         logger.debug('Connect to S3 Bucket')
         bucket = s3.Bucket(s3bucket)
@@ -62,12 +65,18 @@ def connect_s3(connect_type, s3path, local_path):
         
         # use the parsed S3 path to identify path to download file from
         try:
-            bucket.download_file(s3_just_path, local_path)
+            bucket.download_file(s3_local_path, local_path)
         except botocore.exceptions.NoCredentialsError:
             logger.error('Please provide AWS credentials via AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY env variables.')
         else:
             logger.info('Data downloaded from %s to %s', s3path, local_path)
-        
-        
 
+def download_from_s3_pandas(local_path, s3path, sep=';'):
 
+    try:
+        df = pd.read_csv(s3path, sep=sep)
+    except botocore.exceptions.NoCredentialsError:
+        logger.error('Please provide AWS credentials via AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY env variables.')
+    else:
+        df.to_csv(local_path, sep=sep)
+        logger.info('Data uploaded from %s to %s', local_path, s3path)
