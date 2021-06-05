@@ -32,13 +32,14 @@ class tweets(Base):
     def __repr__(self):
         return '<tweet %r>' % self.read_text_clean2
 
-def create_db(engine_string: str) -> None:
+def create_db(engine_string: str):
     """Create database from provided engine string.
 
     Args:
         engine_string: str - Engine string.
 
-    Returns: None.
+    Returns: 
+        engine: sqlalchemy.engine.base.Engine - sqlalchemy connection from amazon rds  
 
     """
     logger.debug("Create table and columns for raw data.")
@@ -47,3 +48,5 @@ def create_db(engine_string: str) -> None:
     Base.metadata.create_all(engine)
     logger.debug("Attempting to create database from engine string.")
     logger.info("Database created.")
+    
+    return engine
