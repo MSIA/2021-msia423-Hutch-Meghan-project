@@ -3,7 +3,6 @@ import argparse
 import boto3
 import botocore
 import re
-#import pandas as pd
 import logging.config
 
 # configure logging
@@ -70,13 +69,3 @@ def connect_s3(connect_type, s3path, local_path):
             logger.error('Please provide AWS credentials via AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY env variables.')
         else:
             logger.info('Data downloaded from %s to %s', s3path, local_path)
-
-def download_from_s3_pandas(local_path, s3path, sep=';'):
-
-    try:
-        df = pd.read_csv(s3path, sep=sep)
-    except botocore.exceptions.NoCredentialsError:
-        logger.error('Please provide AWS credentials via AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY env variables.')
-    else:
-        df.to_csv(local_path, sep=sep)
-        logger.info('Data uploaded from %s to %s', local_path, s3path)
