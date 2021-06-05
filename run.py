@@ -2,17 +2,19 @@ import os
 import argparse
 import re
 
-import logging
-#import pandas as pd
+#import logging
 #import sqlalchemy
 #from sqlalchemy.ext.declarative import declarative_base
 #from sqlalchemy import Column, Integer, String, MetaData
 #from sqlalchemy.orm import sessionmaker
 #from flask_sqlalchemy import SQLAlchemy
 import logging.config
+import config.config as config
 
 # configure logging
-logging.config.fileConfig('config/logging/local.conf')
+logging.config.fileConfig(config.LOGGING_CONFIG)
+logger = logging.getLogger('run')
+
 
 #from src.add_tweets import create_db, tweets
 from src.s3_upload import parse_s3, connect_s3
