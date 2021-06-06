@@ -108,13 +108,13 @@ source s3configs.txt
 Additionally, ensure that you enter your "LASTNAME" and "FIRSTNAME" in the indicated line of code:
 
 ```bash
-docker run --mount type=bind,source="$(pwd)"/data,target=/app/data -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY msia423 run.py --connect_type='upload' --s3path='s3://2021-msia423-hutch-meghan/data/sample_tweets.csv' --local_path='data/tweet.csv'
+docker run --mount type=bind,source="$(pwd)"/data,target=/app/data -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY msia423 run.py --connect_type='upload' --s3path='s3://2021-msia423-hutch-meghan/data/sample_tweets.csv' --local_path='data/tweet.csv' --s3='s3'
 ```
 
 ### To download data from S3
 
 ```
-docker run --mount type=bind,source="$(pwd)"/data,target=/app/data -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY msia423 run.py --connect_type='download' --s3path='s3://2021-msia423-hutch-meghan/data/sample_tweets.csv' --local_path='data/tweet.csv'
+docker run --mount type=bind,source="$(pwd)"/data,target=/app/data -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY msia423 run.py --connect_type='download' --s3path='s3://2021-msia423-hutch-meghan/data/sample_tweets.csv' --local_path='data/tweet.csv' --s3='s3'
 ```
 
 ### 3. Generate database table
@@ -128,7 +128,7 @@ source .mysqlconfig
 The following docker command generates a table for future storage of our data. 
 
 ```bash
-docker run -e MYSQL_USER -e MYSQL_PASSWORD -e MYSQL_HOST -e MYSQL_PORT -e DATABASE_NAME msia423 run.py create_db
+docker run -e MYSQL_USER -e MYSQL_PASSWORD -e MYSQL_HOST -e MYSQL_PORT -e DATABASE_NAME msia423 run.py --mysql='mysql'
 ```
 
 ## 4. View mysql table
@@ -139,7 +139,7 @@ Upon running the docker command to create the mysql table, view the mysql contai
 docker run -it --rm \ mysql:5.7.33 \ mysql \ -h$MYSQL_HOST \ -u$MYSQL_USER \ -p$MYSQL_PASSWORD
 ```
 
-***Note: If you're using windows, append `winpty` to the followign command:***
+***Note: If you're using windows, append `winpty` to the following command:***
 
 ```bash
 winpty docker run -it --rm \ mysql:5.7.33 \ mysql \ -h$MYSQL_HOST \ -u$MYSQL_USER \ -p$MYSQL_PASSWORD
