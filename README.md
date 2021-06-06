@@ -1,4 +1,4 @@
-# Modeling COVID-19 Health Beliefs
+# Temporal Modeling of COVID-19 Health Phenotypes 
 
 **Developer**: Meghan Hutch 
 
