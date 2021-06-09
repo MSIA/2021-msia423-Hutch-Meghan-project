@@ -16,7 +16,7 @@ import config.config as config
 logging.config.fileConfig(config.LOGGING_CONFIG)
 logger = logging.getLogger(__name__)
 
-from src.add_tweets import create_db, topics
+from src.add_topics_db import create_db, topics
 from src.s3_upload import parse_s3, connect_s3
 
 # define variables to connect to mysql
