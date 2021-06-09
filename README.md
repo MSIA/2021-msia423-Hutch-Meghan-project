@@ -10,7 +10,7 @@ The COVID-19 pandemic has resulted in an infodemic of information regarding heal
 
 ## **Mission**
 
-On the backend, we will use an existing dataset of [> 5,000,000 COVID-19 related tweets](https://github.com/HanyinWang/CovidHealthBeliefTweets) previously classified into at least one of five categories: 1) Not related to health belief or related to 2) disease severity, 3) disease susceptibility, 4) benefits or 5) barriers of hydroxychloroquine. Latent Dirichlet Allocation topic modeling will be employed on the annotated tweets in order to identify sub-topics (to be referred to as phenotypes) of the aforementioned categories. 
+On the backend, we will use an existing dataset of [> 5,500,000 COVID-19 related tweets](https://github.com/HanyinWang/CovidHealthBeliefTweets) previously classified into at least one of five categories: 1) Not related to health belief or related to 2) disease severity, 3) disease susceptibility, 4) benefits or 5) barriers of hydroxychloroquine. Latent Dirichlet Allocation topic modeling will be employed on the annotated tweets in order to identify sub-topics (to be referred to as phenotypes) of the aforementioned categories. 
 
 Users of our application will be able to toggle an interactive timeline to examine the identified phenotypes at different time points since the start of the pandemic. Depending on the selected timeframe of interest, the topic model will only run on tweets written during that timeframe. Additionally, the app will include visuals to allow users to see how closely related phenotypes are with one another and which words are associated. The dynamic nature of the application will allow users and researchers to better evaluate the temporality of COVID-19 health belief phenotypes.
 
@@ -162,13 +162,13 @@ use msia423_db;
 **View table:**
 
 ```bash
-SELECT * from tweets;
+SELECT * from topics;
 ```
 
 **Show columns in table:**
 
 ```bash
-SHOW COLUMNS FROM tweets;
+SHOW COLUMNS FROM topics;
 ```
 
 

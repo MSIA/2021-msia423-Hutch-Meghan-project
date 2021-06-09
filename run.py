@@ -14,9 +14,9 @@ import config.config as config
 
 # configure logging
 logging.config.fileConfig(config.LOGGING_CONFIG)
-logger = logging.getLogger('run')
+logger = logging.getLogger(__name__)
 
-from src.add_tweets import create_db, tweets
+from src.add_tweets import create_db, topics
 from src.s3_upload import parse_s3, connect_s3
 
 # define variables to connect to mysql
@@ -26,20 +26,6 @@ password = os.getenv("MYSQL_PASSWORD")
 host = os.getenv("MYSQL_HOST")
 port = os.getenv("MYSQL_PORT")
 db_name = os.getenv("DATABASE_NAME")
-
-# add a fake tweet to our database as an example
-#tweet = tweets(read_tweet_id=2,
-#                created_at="1900-01-01",
-#                user_location_id=999, 
-#                coordinates="long:123",
-#                place="Boston,MA",
-#                read_text_clean2="fake tweet",
-#                Perceived_susceptibility=999,
-#                Perceived_severity=999,
-#                Perceived_benefits=999,
-#                Perceived_barriers=999)  
-#session.add(tweet)
-#print(session.commit())
 
 if __name__ == '__main__':
     
