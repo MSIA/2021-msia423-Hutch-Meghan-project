@@ -40,6 +40,8 @@ if __name__ == '__main__':
                         help="If used, upload data to the specified s3 path")
     parser.add_argument('--local_path', default='data/tweet.csv',
                         help="Where to load data to in S3")
+    parser.add_argument('--train_model', default=False,
+                        help="Where to load data to in S3")
     args = parser.parse_args()
     
     if args.s3:
