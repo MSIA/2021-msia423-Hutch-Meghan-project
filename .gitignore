@@ -10,7 +10,7 @@ __pycache__/
 s3config.txt
 .R
 
-data/*
+data/external/*
 !data/sample/
 config/local
 !.gitkeep
