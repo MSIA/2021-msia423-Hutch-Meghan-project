@@ -63,11 +63,12 @@ if __name__ == '__main__':
     parser.add_argument('--local_path', default='data/tweet.csv',
                         help="Where to load data to in S3")
     parser.add_argument('--model_train', default=False,
-                        help="Where to load data to in S3")
+                        help="Run model")
     args = parser.parse_args()
     
     if args.s3:
         # connect to s3
+        print(args.s3path)
         connect_s3(args.connect_type, args.s3path, args.local_path)
     
     if args.mysql:
