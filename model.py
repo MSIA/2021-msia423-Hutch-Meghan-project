@@ -25,7 +25,6 @@ from sqlalchemy.orm import sessionmaker
 from flask_sqlalchemy import SQLAlchemy
 from sklearn.model_selection import train_test_split
 
-
 from src.process_data import load_tweet_data, remove_duplicates, format_dates, timeframe, clean_text, create_dictionary
 from src.train_lda import topic_eval, get_max_k, get_doc_topic_matrix, create_topics_table, train_lda
 from src.viz_topics import create_word_clouds
@@ -33,6 +32,8 @@ from src.add_topics_db import create_db, Topics
 from src.s3_upload import parse_s3, connect_s3
 import logging.config
 import config.config as config
+
+nltk.download('punkt')
 
 # configure logging
 logging.config.fileConfig(config.LOGGING_CONFIG)

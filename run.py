@@ -34,6 +34,9 @@ from src.s3_upload import parse_s3, connect_s3
 import logging.config
 import config.config as config
 
+nltk.download('punkt')
+
+
 # configure logging
 logging.config.fileConfig(config.LOGGING_CONFIG)
 logger = logging.getLogger(__name__)
