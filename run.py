@@ -7,6 +7,7 @@ import yaml
 import random
 import pandas as pd
 import numpy as np
+import string 
 import nltk
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
@@ -68,7 +69,6 @@ if __name__ == '__main__':
     
     if args.s3:
         # connect to s3
-        print(args.s3path)
         connect_s3(args.connect_type, args.s3path, args.local_path)
     
     if args.mysql:
@@ -107,14 +107,14 @@ if __name__ == '__main__':
         # Run First Analysis.
         logger.info("Running first analysis.")
 
-        tweet_data_subset, input_date = timeframe(tweet_data_formatted, input_date = config['process_data']['timeframe']['time_frame1'])
+        tweet_data_subset, input_date = timeframe(tweet_data_formatted, input_date = config['process_data']['time_frame']['time_frame1'])
         logging.info("Length of time sliced dataframe is %s rows", len(tweet_data_subset))
 
         doc_clean = [clean_text(tweets, stop_words_list, exclude, lemma).split() for tweets in tweet_data_subset['read_text_clean2']]
 
         dictionary, doc_term_matrix = create_dictionary(doc_clean)
 
-        max_k, cov_model, coherence_score, doc_topic_df, top_tweets, input_date = train_lda(doc_clean, doc_term_matrix, dictionary, top_k = config['tune_model']['k_topics'], input_date = config['process_data']['timeframe']['time_frame1'], tweet_df = tweet_data_subset, coherence_score_method = config['tune_model']['coherence_score_method'])
+        max_k, cov_model, coherence_score, doc_topic_df, top_tweets, input_date = train_lda(doc_clean, doc_term_matrix, dictionary, top_k = config['tune_model']['k_topics'], input_date = config['process_data']['time_frame']['time_frame1'], tweet_df = tweet_data_subset, coherence_score_method = config['tune_model']['coherence_score_method'])
 
         ## visualize model 
         create_word_clouds(cov_model, input_date)
@@ -129,14 +129,14 @@ if __name__ == '__main__':
 
         # Run Second Analysis
         logger.info("Running second analysis.")
-        tweet_data_subset, input_date = timeframe(tweet_data_formatted, input_date = config['process_data']['timeframe']['time_frame2'])
+        tweet_data_subset, input_date = timeframe(tweet_data_formatted, input_date = config['process_data']['time_frame']['time_frame2'])
         logging.info("Length of time sliced dataframe is %s rows", len(tweet_data_subset))
 
         doc_clean = [clean_text(tweets, stop_words_list, exclude, lemma).split() for tweets in tweet_data_subset['read_text_clean2']]
 
         dictionary, doc_term_matrix = create_dictionary(doc_clean)
 
-        max_k, cov_model, coherence_score, doc_topic_df, top_tweets, input_date = train_lda(doc_clean, doc_term_matrix, dictionary, top_k = config['tune_model']['k_topics'], input_date = config['process_data']['timeframe']['time_frame2'], tweet_df = tweet_data_subset, random_state = config['train_model']['random_state'], coherence_score_method = config['tune_model']['coherence_score_method'])
+        max_k, cov_model, coherence_score, doc_topic_df, top_tweets, input_date = train_lda(doc_clean, doc_term_matrix, dictionary, top_k = config['tune_model']['k_topics'], input_date = config['process_data']['time_frame']['time_frame2'], tweet_df = tweet_data_subset, random_state = config['train_model']['random_state'], coherence_score_method = config['tune_model']['coherence_score_method'])
 
         ## visualize model 
         create_word_clouds(cov_model, input_date)

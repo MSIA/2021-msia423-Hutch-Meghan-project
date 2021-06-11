@@ -23,13 +23,13 @@ process_data:
         random_state: 66826
         test_size: 0.005
     time_frame: 
-        timeframe1: '2020-01-15'
-        timeframe2: '2020-03-01'
+        time_frame1: '2020-01-15'
+        time_frame2: '2020-03-01'
 tune_model:
     method: LdaModel
     k_topics: 10
     random_state: 66826
-    coherence: 'c_v'
+    coherence_score_method: 'c_v'
 train_model:
     method: LdaModel
     save_tmo: ['models/lda_cov_model_2020-01-15', 'lda_cov_model_2020-01-15.expElogbeta.npy', 'lda_cov_model_2020-01-15.id2word',
