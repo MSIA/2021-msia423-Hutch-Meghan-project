@@ -7,6 +7,7 @@ import pandas as pd
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
 from gensim import corpora
 from gensim.test.utils import common_corpus, common_dictionary
 from gensim.models.ldamodel import LdaModel
@@ -82,7 +83,7 @@ def format_dates(df):
     
     return df
 
-# function to select timeframe of interest (+ 30 days)
+# function to select timeframe of interest (+ 15 days)
 def timeframe(df, input_date = '2020-01-01'):
     """Subset starting at the input_date + the next 30 days
     
@@ -97,7 +98,7 @@ def timeframe(df, input_date = '2020-01-01'):
     
     usr_input = pd.to_datetime(input_date)
     
-    logger.debug("Subset dataframe by the input_date + 30 days.")
+    logger.debug("Subset dataframe by the input_date + 15 days.")
 
     df = df[(df['date'] >= usr_input) & (df['date'] < (usr_input + timedelta(days=15)))]
 
@@ -106,12 +107,14 @@ def timeframe(df, input_date = '2020-01-01'):
     return df, input_date
     
 # function to clean text 
-def clean_text(tweets, exclude, lemma):
+def clean_text(tweets, stop_words_list, exclude, lemma):
     """Clean text data by removing punctuation and implementing lemmatization.
     
     Args:
         tweets: dataframe - dataframe subset by time.
-        exclude: set - set of non-alphanumeric characters to remove.]
+        stop_words_list: list - list of words to remove from the analysis.
+        exclude: set - set of non-alphanumeric characters to remove.
+        lemma: nltk method to lemmatize text.
     
     Returns:
         doc_clean: dataframe - dataframe with processed text.
@@ -119,12 +122,13 @@ def clean_text(tweets, exclude, lemma):
 
     logger.debug("Begin text processing.")
     
-    logger.info("Remove punctuation.")
+    logger.info("Tokenize and Remove stop words")
+    stop_free = " ".join([i for i in word_tokenize(tweets) if i not in stop_words_list])
     
-    punc_free = ''.join(ch for ch in tweets.lower().split() if ch not in exclude)
+    logger.info("Remove punctuation.")
+    punc_free = ''.join(ch for ch in stop_free if ch not in exclude)
     
     logger.info("Lemmatize words.")
-    
     doc_clean = " ".join(lemma.lemmatize(word) for word in punc_free.split())
     
     return doc_clean

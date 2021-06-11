@@ -46,8 +46,6 @@ def topic_eval(doc_clean, doc_term_matrix, dictionary, top_k, input_date):
     
     logger.debug("Evaluate whether the last tested k had the highest coherence score. If so, next iteration may want to increase k.")
     
-    s = pd.Series(lda_results.score.values, index=lda_results.topic.values)
-    
     logger.debug("Generate a plot of coherence score by k topics.")
     
     return lda_results
@@ -62,16 +60,19 @@ def get_max_k(lda_results):
     
     return max_k
      
-def get_doc_topic_matrix(lda_model, doc_term_matrix, tweet_df):
+def get_doc_topic_matrix(lda_model, doc_term_matrix, tweet_df, input_date):
     """Caculates the topic probability of each tweet and then assigns the topic with the highest probability.
     
     Args: 
         lda_model: lda object - trained lda model object.
         doc_term_matrix: list - bag of words matrix with frequency of each term mapped to dictionary id. 
         tweet_df: dataframe - orgiinal dataframe of covid-19 tweets.
+        input_date: str - date used to subset dataframe.
     
     Return: 
         doc_topic_max_df: dataframe - dataframe containing a row for each tweet with a column 'topic_num' indicating the topic with the highest probability for that tweet.
+        doc_topic_df: dataframe - dataframe of tweets and their probabilities per topic.
+        
     """
     
     logger.debug("Calculate topic probability of each tweet.")
@@ -85,13 +86,13 @@ def get_doc_topic_matrix(lda_model, doc_term_matrix, tweet_df):
     logger.debug("For each original tweet, assign a column with the topic_num containing the max probability of being associated with that tweet.")
     
     for d in range(len(doc_topics)):
-        max_topic = max(doc_topics[d])
-        topic_df = pd.DataFrame(max_topic).transpose()
+        topic_df = pd.DataFrame(doc_topics[d])
         topic_df.columns = ['topic_num', 'prob']
-        timeframe_slice = tweet_df[['read_text_clean2','Perceived_susceptibility', 'Perceived_severity', 'Perceived_benefits', 'Perceived_barriers']].iloc[[d]]
-        timeframe_slice = timeframe_slice.reset_index()
-        topic_df = pd.concat([topic_df, timeframe_slice], axis=1, join="inner")
-        del topic_df['index'] 
+        topic_df = topic_df.iloc[topic_df['prob'].argmax()]
+        topic_df = pd.DataFrame(topic_df).transpose()
+        tweet_data_subset_df = tweet_df.reset_index()
+        timeframe_slice = tweet_data_subset_df[['read_text_clean2','Perceived_susceptibility', 'Perceived_severity', 'Perceived_benefits', 'Perceived_barriers']]
+        topic_df = pd.concat([topic_df, timeframe_slice.reindex(topic_df.index)], axis=1, join="inner")
         doc_topic_max.append(topic_df)
         
     logger.info("New topic probability dataframe created.")
@@ -100,9 +101,11 @@ def get_doc_topic_matrix(lda_model, doc_term_matrix, tweet_df):
     
     logger.debug("Count the number of original health-belief annotations by topic_num.")
     
-    doc_topic_matrix = doc_topic_max_df.groupby(['topic_num'])['Perceived_susceptibility', 'Perceived_severity', 'Perceived_benefits','Perceived_barriers'].sum().reset_index()
+    doc_topic_df = doc_topic_max_df.copy()
     
-    doc_topic_matrix['count'] = doc_topic_matrix['topic_num'].map(doc_topic_max_df['topic_num'].value_counts())
+    doc_topic_matrix = doc_topic_df.groupby(['topic_num'])['Perceived_susceptibility', 'Perceived_severity', 'Perceived_benefits','Perceived_barriers'].sum().reset_index()
+    
+    doc_topic_matrix['count'] = doc_topic_matrix['topic_num'].map(doc_topic_df['topic_num'].value_counts())
     
     logger.info("Matrix of topic_num and annotation counts generated.")
     
@@ -112,13 +115,14 @@ def get_doc_topic_matrix(lda_model, doc_term_matrix, tweet_df):
     
     logger.info("Matrix saved.")
     
-    return doc_topic_matrix
+    return doc_topic_matrix, doc_topic_df
 
-def create_topics_table(doc_topic_max_df, input_date):
+def create_topics_table(doc_topic_df, input_date):
     """Creates a confusion-like-matrix to count annotations of the orginal tweets per highest probable topic.
     
         Args: 
-            doc_topic_max_df: dataframe - dataframe of the tweets mapped to their highest probable topic.
+            doc_topic_df: dataframe - dataframe of the tweets mapped to their highest probable topic.
+            input_date: str - input_date will be added to a new column to indicate the time period that generated the topic.
         
         Returns:
             top_tweets: dataframe - dataframe containing counts of original annotations by topic_num.
@@ -126,7 +130,7 @@ def create_topics_table(doc_topic_max_df, input_date):
     
     logger.debug("Sort doc_topic_max_df in order of probability.")
     
-    doc_topic_max_df_ordered = doc_topic_max_df.sort_values('prob', ascending=False)
+    doc_topic_max_df_ordered = doc_topic_df.sort_values('prob', ascending=False)
     top_tweets = doc_topic_max_df_ordered.groupby('topic_num').head(3)
     top_tweets.sort_values('topic_num')
 
@@ -177,12 +181,16 @@ def train_lda(doc_clean, doc_term_matrix, dictionary, top_k, input_date, tweet_d
     # save plots
     s = pd.Series(lda_results.score.values, index=lda_results.topic.values)
     
-    pltk = s.plot()
-    fig = pltk.get_figure()
-    fig.savefig("app/static/" + input_date + "_k_topics" + ".png")
+    plt = s.plot()
+    plt = plt.get_figure()
+    plt.savefig("app/static/" + input_date + "_k_topics" + ".png")
+    plt.clf()
     
+    logger.debug("Determine optimal number of k topics.")
     # get k with highest coherence score
     max_k = get_max_k(lda_results)
+    
+    logger.info("%s is the optimal k", max_k)
     
     # train model with optimal k
     cov_model = LdaModel(corpus = doc_term_matrix, id2word = dictionary, num_topics = max_k, random_state=66826)
@@ -190,7 +198,7 @@ def train_lda(doc_clean, doc_term_matrix, dictionary, top_k, input_date, tweet_d
     # save trained model object
     logger.debug("Save trained LDA object.")
     
-    cov_model.save('models/' + 'lda_cov_model' + '_' + 'input_date')
+    cov_model.save('models/' + 'lda_cov_model' + '_' + input_date)
     
     logger.info("LDA object saved to 'model/' folder.")
     
@@ -204,9 +212,9 @@ def train_lda(doc_clean, doc_term_matrix, dictionary, top_k, input_date, tweet_d
         logging.warning("Coherence Score is low. Test new k.")
           
     # determine topic with the highest probability for each tweet
-    doc_topic_max_df = get_doc_topic_matrix(cov_model, doc_term_matrix, tweet_df)
+    doc_topic_matrix, doc_topic_df = get_doc_topic_matrix(cov_model, doc_term_matrix, tweet_df, input_date)
     
     # create topics table
-    top_tweets = create_topics_table(doc_topic_max_df, input_date)
+    top_tweets = create_topics_table(doc_topic_df, input_date)
 
-    return max_k, cov_model, coherence_score, doc_topic_max_df, top_tweets, input_date
+    return max_k, cov_model, coherence_score, doc_topic_df, top_tweets, input_date

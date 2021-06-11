@@ -1,4 +1,5 @@
 import logging.config
+import numpy as np
 import gensim 
 import matplotlib.colors as mcolors
 from wordcloud import WordCloud, STOPWORDS
@@ -22,7 +23,7 @@ def create_word_clouds(cov_model, input_date):
 
     cloud = WordCloud(background_color='white',
                       width=2500,
-                      height=1800,
+                      height=2500,
                       max_words=20,
                       colormap='tab10',
                       color_func=lambda *args, **kwargs: cols[i],
@@ -32,26 +33,25 @@ def create_word_clouds(cov_model, input_date):
     
     topics = cov_model.show_topics(formatted=False)
     
-    n_topics = len(topics)
+    n_topics = int(len(topics))
     
-    sub_plot_row = n_topics/2
-    
+    logger.info("Return topics", n_topics)
+
     logger.info("Topics object will contain the top significant terms associated with each topic.")
 
-    fig, axes = plt.subplots(sub_plot_row,2, figsize=(10,10), sharex=True, sharey=True)
+    fig, axes = plt.subplots(n_topics, figsize=(25,25), sharex=True, sharey=True)
 
     logger.info("Return topics for the lda model in a word cloud.")
     
     for i, ax in enumerate(axes.flatten()):
         fig.add_subplot(ax)
         topic_words = dict(topics[i][1])
+        logging.info("Print top 10 words in each topics %s", topics[i])
         cloud.generate_from_frequencies(topic_words, max_font_size=300)
-        # If number of topics is not an even number, we delete the last subplot.
-        if (sub_plot_row % 2) != 0:
-            axes[(sub_plot_row-1),1].set_axis_off()
         plt.gca().set_title('Topic ' + str(i), fontdict=dict(size=20))
         plt.gca().axis('off')
         plt.savefig('app/static/word_cloud_' + input_date + ".png", facecolor='w')
         plt.gca().imshow(cloud)
+    plt.clf()
     
     logger.debug("Save word cloud images.")

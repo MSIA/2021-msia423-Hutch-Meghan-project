@@ -13,7 +13,7 @@ Base = declarative_base()
 
 # code adapted from Michael Fedell's SQLAchemy tutorial: https://github.com/MSIA/423-sqlalchemy-lab-activity
 
-class topics(Base):
+class Topics(Base):
     """Create a data model for the database to store topics for time periods."""
 
     __tablename__ = 'topics'
@@ -50,3 +50,26 @@ def create_db(engine_string: str):
     
     return engine
 
+class TopicManager:
+
+    def __init__(self, app=None, engine_string=None):
+        """
+        Args:
+            app: Flask - Flask app
+            engine_string: str - Engine string
+        """
+        if app:
+            self.db = SQLAlchemy(app)
+            self.session = self.db.session
+        elif engine_string:
+            engine = sqlalchemy.create_engine(engine_string)
+            Session = sessionmaker(bind=engine)
+            self.session = Session()
+        else:
+            raise ValueError("Need either an engine string or a Flask app to initialize")
+
+    def close(self) -> None:
+        """Closes session
+        Returns: None
+        """
+        self.session.close()

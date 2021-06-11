@@ -13,7 +13,7 @@ logger.setLevel("INFO")
 boto3.set_stream_logger('botocore', level='DEBUG')
 
 # parse_s3 function written in the MSIA-423/aws-s3 tutorial
-def parse_s3(s3path):
+def parse_s3(s3path_str):
     """Parse the S3 path and derive S3 bucket and S3 path.
     
     Args:
@@ -51,7 +51,7 @@ def connect_s3(connect_type, s3path, local_path):
         s3 = boto3.resource("s3")
         logger.debug('Connect to S3 Bucket')
         bucket = s3.Bucket(s3bucket)
-        bucket.upload_file("data/sample/tweets.csv", s3_local_path)
+        bucket.upload_file("data/external/constructs.csv", s3_local_path)
         logger.info('Data uploaded to S3 bucket.')
     
     elif connect_type == 'download':
