@@ -39,7 +39,7 @@ evaluate_model:
 performance:
     timeframe1:
         best_k: 9
-        coherence: 
+        coherence: 0.347
     timeframe2: 
         best_k: 7
-        coherence:
+        coherence: 0.366
