@@ -34,6 +34,7 @@ import logging.config
 import config.config as config
 
 nltk.download('punkt')
+nltk.download('wordnet')
 
 # configure logging
 logging.config.fileConfig(config.LOGGING_CONFIG)
@@ -42,6 +43,15 @@ logger = logging.getLogger(__name__)
 # load and parse yaml file.
 a_yaml_file = open("config/model-meta.yaml")
 config = yaml.load(a_yaml_file, Loader=yaml.FullLoader)
+
+# define variables to connect to mysql
+conn_type = "mysql+pymysql"
+user = os.getenv("MYSQL_USER")
+password = os.getenv("MYSQL_PASSWORD")
+host = os.getenv("MYSQL_HOST")
+port = os.getenv("MYSQL_PORT")
+db_name = os.getenv("DATABASE_NAME")
+
 
 if __name__ == '__main__':
 

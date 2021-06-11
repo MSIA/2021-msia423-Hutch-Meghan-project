@@ -61,7 +61,7 @@ For users and researchers interested in the analysis, the following details the 
 
 ## Results
     
-While preliminary results are exploratory, we found that the max coherence metric was .... While lower than initially expected, it is believed that performance will improve upon the future deployment of rigorous hyperparameter tuning and removal of superfluous stopwords. Upon review of the word clouds and topic probabilities of tweets and their associated annotations, it does appear possible to identify themes in the topics and to see how these themes differed at different points during the pandemic.
+While preliminary results are exploratory, we found that coherence was generally low. While lower than initially expected, it is believed that performance will improve upon the future deployment of rigorous hyperparameter tuning and removal of superfluous stopwords. Upon review of the word clouds and topic probabilities of tweets and their associated annotations, it does appear possible to identify themes in the topics and to see how these themes differed at different points during the pandemic. Also of note, the default code in this repo had to down-sample very heavily in order to facilitate run down and computational challenges. In expereiments, using larger datasets, coherence scores appeared to be higher and topics grouped together in more interesting pattens.
 
 ## Deployed APP
 
