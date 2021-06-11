@@ -29,7 +29,16 @@ def index():
     
 @app.route("/january")
 def january():
-    return render_template('january.html')
+    try:
+        topics = topics_manager.session.query(topics).limit(app.config["MAX_ROWS_SHOW"]).all()
+        logger.debug("January page accessed")
+        return render_template('january.html', topics=topics)
+    except:
+        traceback.print_exc()
+        logger.warning("Not able to display topics, error page returned")
+        return render_template('error.html')
+    
+    #return render_template("january.html", return = results)
 
 @app.route("/march")
 def march():

@@ -6,15 +6,13 @@ WORKDIR /app
 
 COPY ./requirements.txt /app/requirements.txt
 
-COPY ./src/s3_upload.py /app/s3_upload.py
-
-COPY ./src/add_tweets.py /app/add_tweets.py
-
-COPY ./run.py /app/run.py
-
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
 
 COPY . /app
 
-ENTRYPOINT [ "python3"]
+EXPOSE 5000
+
+ENTRYPOINT [ "python3" ]
+
+

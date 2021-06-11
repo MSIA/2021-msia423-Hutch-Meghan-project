@@ -1,3 +1,5 @@
+import argparse
+
 import boto3
 import botocore
 import re
@@ -11,7 +13,7 @@ logger.setLevel("INFO")
 boto3.set_stream_logger('botocore', level='DEBUG')
 
 # parse_s3 function written in the MSIA-423/aws-s3 tutorial
-def parse_s3(s3path):
+def parse_s3(s3path_str):
     """Parse the S3 path and derive S3 bucket and S3 path.
     
     Args:
@@ -25,9 +27,9 @@ def parse_s3(s3path):
     
     regex = r"s3://([\w._-]+)/([\w./_-]+)"
 
-    m = re.match(regex, s3path)
+    m = re.match(regex, s3path_str)
     s3bucket = m.group(1)
-    s3path = m.group(2)
+    s3_local_path = m.group(2)
 
     return s3bucket, s3path
 
@@ -45,16 +47,16 @@ def connect_s3(connect_type, s3path, local_path):
     
     if connect_type == 'upload':
         
-        s3bucket, s3_just_path = parse_s3(s3path)
+        s3bucket, s3_local_path = parse_s3(s3path)
         s3 = boto3.resource("s3")
         logger.debug('Connect to S3 Bucket')
         bucket = s3.Bucket(s3bucket)
-        bucket.upload_file("data/sample/tweets.csv", "data/sample_tweets.csv")
+        bucket.upload_file("data/external/constructs.csv", s3_local_path)
         logger.info('Data uploaded to S3 bucket.')
     
     elif connect_type == 'download':
         
-        s3bucket, s3_just_path = parse_s3(s3path)
+        s3bucket, s3_local_path = parse_s3(s3path)
         s3 = boto3.resource("s3")
         logger.debug('Connect to S3 Bucket')
         bucket = s3.Bucket(s3bucket)
@@ -62,12 +64,8 @@ def connect_s3(connect_type, s3path, local_path):
         
         # use the parsed S3 path to identify path to download file from
         try:
-            bucket.download_file(s3_just_path, local_path)
+            bucket.download_file(s3_local_path, local_path)
         except botocore.exceptions.NoCredentialsError:
             logger.error('Please provide AWS credentials via AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY env variables.')
         else:
             logger.info('Data downloaded from %s to %s', s3path, local_path)
-        
-        
-
-

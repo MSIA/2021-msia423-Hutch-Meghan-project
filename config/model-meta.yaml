@@ -1,0 +1,45 @@
+---
+acquire:
+    command: s3_download
+    column_names: [predicted, created_at, read_user_id, read_tweet_id, user_location, coordinates, place, read_text_clean2, Perceived_susceptibility, Perceived_severity, Perceived_benefits, Perceived_barriers]
+model:
+    name: prelim-lda
+    author: Meghan Hutch
+    version: v1
+    description: perform lda on covid19 related tweets
+    tags:
+    - lda
+    - topic model
+    - covid-19
+    - tweets
+    dependencies: requirements.txt
+load_data:
+    how: csv
+    data:
+        path: data/external/constructs.data
+        columns: [predicted, created_at, read_user_id, read_tweet_id, user_location, coordinates, place, read_text_clean2, Perceived_susceptibility, Perceived_severity, Perceived_benefits, Perceived_barriers]
+process_data: 
+    sample_data:
+        random_state: 66826
+        test_size: 0.005
+    time_frame: 
+        time_frame1: '2020-01-15'
+        time_frame2: '2020-03-01'
+tune_model:
+    method: LdaModel
+    k_topics: 10
+    random_state: 66826
+    coherence_score_method: 'c_v'
+train_model:
+    method: LdaModel
+    save_tmo: ['models/lda_cov_model_2020-01-15', 'lda_cov_model_2020-01-15.expElogbeta.npy', 'lda_cov_model_2020-01-15.id2word',
+    'lda_cov_model_2020-01-15.state', 'lda_cov_model_2020-03-01', 'lda_cov_model_2020-03-01.expElogbeta.npy', 'lda_cov_model_2020-03-01.id2word', 'lda_cov_model_2020-03-01.state']
+evaluate_model:
+    metric: [coherence_score]
+performance:
+    timeframe1:
+        best_k: 9
+        coherence: 
+    timeframe2: 
+        best_k: 7
+        coherence:
