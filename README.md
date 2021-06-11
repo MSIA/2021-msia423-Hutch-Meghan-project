@@ -240,7 +240,16 @@ To perform unit testing upon cloning of the repo, run the following docker comma
 docker run msia423 -m pytest test/unit_tests.py
 ```
 
-## 6. Run the App
+## Run the Model Pipeline
+
+To train the lda and generate visulizations and tables, run the following docker command.
+
+```
+docker run msia423 models.py
+```
+
+
+## 7. Run the App
 
 To run the Flask APP locally, run the following docker command: 
 
