@@ -12,3 +12,4 @@ numpy==1.18.1
 matplotlib==3.3.4
 wordcloud==1.8.1    
 python-levenshtein==0.12.2
+scikit-learn==0.24.2

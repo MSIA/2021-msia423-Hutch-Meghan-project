@@ -43,9 +43,9 @@ The larger purpose of this application is to help support public awareness of ch
 
 For users and researchers interested in the analysis, the following details the high-level overview of the project. 
 
-1. > 5.5 million COVID-19 health related tweets were processed via tokenization, removal of punctuation and lemmenization
+1. 5.5 million COVID-19 health related tweets were processed via tokenization, removal of punctuation and lemmenization
 
-2. Data was subset into different time frames of the pandemic: 1) Jan-01-2020-Jan-15-2020 and 2) March 01-2020-March-15-2020
+2. Data was subset into different time frames of the pandemic: 1) Jan-15-2020-Jan-30-2020 and 2) March 01-2020-March-15-2020
 
 3. Hyperparameter testing in terms of k topics was performed in order to identify the optimal number of topics (as determined by the max coherence score when performing LDA) for each timeframe of tweets
 

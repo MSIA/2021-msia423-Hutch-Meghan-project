@@ -3,12 +3,30 @@ import argparse
 import re
 
 import logging
+import random
+import pandas as pd
+import numpy as np
+import nltk
+from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+from gensim import corpora
+from gensim.test.utils import common_corpus, common_dictionary
+from gensim.models.ldamodel import LdaModel
+from gensim.models.coherencemodel import CoherenceModel
+import matplotlib.colors as mcolors
+from wordcloud import WordCloud, STOPWORDS
+from matplotlib import pyplot as plt
 import sqlalchemy
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, MetaData
 from sqlalchemy.orm import sessionmaker
 from flask_sqlalchemy import SQLAlchemy
 
+
+from src.process_data import load_tweet_data, remove_duplicates, format_dates, timeframe, clean_text, create_dictionary
+from src.train_lda import topic_eval, get_max_k, get_doc_topic_matrix, create_topics_table, train_lda
+from src.viz_topics import create_word_clouds
+from src.add_topics_db import create_db, topics
 import logging.config
 import config.config as config
 
@@ -40,7 +58,7 @@ if __name__ == '__main__':
                         help="If used, upload data to the specified s3 path")
     parser.add_argument('--local_path', default='data/tweet.csv',
                         help="Where to load data to in S3")
-    parser.add_argument('--train_model', default=False,
+    parser.add_argument('--model_train', default=False,
                         help="Where to load data to in S3")
     args = parser.parse_args()
     
@@ -54,6 +72,81 @@ if __name__ == '__main__':
 
         # create database for storing raw data
         engine = create_db(engine_string)
+
+        Session = sessionmaker(bind=engine)  
+        session = Session()
+    
+    if args.model_train:
+        
+        # Prepare methods for text processin
+        exclude = set(string.punctuation)
+        lemma = WordNetLemmatizer()
+
+        # create list of stop words
+        alphabet_remove = list(string.ascii_lowercase)
+        number_remove = list(range(0, 9999))
+        number_remove = map(str, number_remove) 
+        number_remove = list(number_remove)
+
+        stop_words_list = number_remove + alphabet_remove
+
+        # Process data
+        tweet_data = load_tweet_data(data_path = 'data/external/constructs.csv')
+        logger.debug("Randomly sample rows to reduce dataframe and speed up modeling.")
+        #np.random.seed(66826)
+        #chosen_idx = np.random.choice(len(tweet_data), replace=False, size=25000)
+        #tweet_data = tweet_data.sample(n=25000 random_state=66826)
+        from sklearn.model_selection import train_test_split
+        train, tweet_data = train_test_split(tweet_data, test_size=0.005, random_state=66826)
+        
+        logger.info("Dataframe sampled with %s rows", len(tweet_data))
+        tweet_data = remove_duplicates(tweet_data)
+        tweet_data_formatted = format_dates(tweet_data)
+
+        # Run First Analysis.
+        logger.info("Running first analysis.")
+
+        tweet_data_subset, input_date = timeframe(tweet_data_formatted, input_date = '2020-01-15')
+        logging.info("Length of time sliced dataframe is %s rows", len(tweet_data_subset))
+
+        doc_clean = [clean_text(tweets, stop_words_list, exclude, lemma).split() for tweets in tweet_data_subset['read_text_clean2']]
+
+        dictionary, doc_term_matrix = create_dictionary(doc_clean)
+
+        max_k, cov_model, coherence_score, doc_topic_df, top_tweets, input_date = train_lda(doc_clean, doc_term_matrix, dictionary, top_k = 10, input_date = '2020-01-15', tweet_df = tweet_data_subset)
+
+        ## visualize model 
+        create_word_clouds(cov_model, input_date)
+
+        logger.debug("Connect to mysql engine string.")
+        engine_string = f"{conn_type}://{user}:{password}@{host}:{port}/{db_name}"
+
+        engine = create_db(engine_string)
+
+        logger.info("Save top_tweets table to MYSQL")
+        top_tweets.to_sql(name='topics', con=engine, if_exists = 'append', index=False)
+
+        # Run Second Analysis
+        logger.info("Running second analysis.")
+        tweet_data_subset, input_date = timeframe(tweet_data_formatted, input_date = '2020-03-01')
+        logging.info("Length of time sliced dataframe is %s rows", len(tweet_data_subset))
+
+        doc_clean = [clean_text(tweets, stop_words_list, exclude, lemma).split() for tweets in tweet_data_subset['read_text_clean2']]
+
+        dictionary, doc_term_matrix = create_dictionary(doc_clean)
+
+        max_k, cov_model, coherence_score, doc_topic_df, top_tweets, input_date = train_lda(doc_clean, doc_term_matrix, dictionary, top_k = 10, input_date = '2020-03-01', tweet_df = tweet_data_subset)
+
+        ## visualize model 
+        create_word_clouds(cov_model, input_date)
+
+        logger.debug("Connect to mysql engine string.")
+        engine_string = f"{conn_type}://{user}:{password}@{host}:{port}/{db_name}"
+
+        engine = create_db(engine_string)
+
+        logger.info("Save top_tweets table to MYSQL")
+        top_tweets.to_sql(name='topics', con=engine, if_exists = 'append', index=False)
 
         Session = sessionmaker(bind=engine)  
         session = Session()
