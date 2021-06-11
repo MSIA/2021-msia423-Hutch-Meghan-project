@@ -113,7 +113,7 @@ if __name__ == '__main__':
 
         dictionary, doc_term_matrix = create_dictionary(doc_clean)
 
-        max_k, cov_model, coherence_score, doc_topic_df, top_tweets, input_date = train_lda(doc_clean, doc_term_matrix, dictionary, top_k = config['tune_model']['k_topics'], input_date = config['process_data']['timeframe']['time_frame1'], tweet_df = tweet_data_subset)
+        max_k, cov_model, coherence_score, doc_topic_df, top_tweets, input_date = train_lda(doc_clean, doc_term_matrix, dictionary, top_k = config['tune_model']['k_topics'], input_date = config['process_data']['timeframe']['time_frame1'], tweet_df = tweet_data_subset, coherence_score_method = config['tune_model']['coherence_score_method'])
 
         ## visualize model 
         create_word_clouds(cov_model, input_date)
@@ -135,7 +135,7 @@ if __name__ == '__main__':
 
         dictionary, doc_term_matrix = create_dictionary(doc_clean)
 
-        max_k, cov_model, coherence_score, doc_topic_df, top_tweets, input_date = train_lda(doc_clean, doc_term_matrix, dictionary, top_k = config['tune_model']['k_topics'], input_date = config['process_data']['timeframe']['time_frame2'], tweet_df = tweet_data_subset, random_state = config['train_model']['random_state'], config['tune_model']['coherence_score_method'])
+        max_k, cov_model, coherence_score, doc_topic_df, top_tweets, input_date = train_lda(doc_clean, doc_term_matrix, dictionary, top_k = config['tune_model']['k_topics'], input_date = config['process_data']['timeframe']['time_frame2'], tweet_df = tweet_data_subset, random_state = config['train_model']['random_state'], coherence_score_method = config['tune_model']['coherence_score_method'])
 
         ## visualize model 
         create_word_clouds(cov_model, input_date)
