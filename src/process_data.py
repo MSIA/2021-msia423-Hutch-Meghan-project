@@ -15,6 +15,8 @@ from gensim.models.coherencemodel import CoherenceModel
 
 import logging.config
 
+nltk.download('punkt')
+
 # configure logger
 logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
