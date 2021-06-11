@@ -31,7 +31,7 @@ def parse_s3(s3path_str):
     s3bucket = m.group(1)
     s3_local_path = m.group(2)
 
-    return s3bucket, s3_local_path
+    return s3bucket, s3path
 
 def connect_s3(connect_type, s3path, local_path):
     """Connect to S3 bucket to upload or download data.

@@ -23,7 +23,7 @@ def create_word_clouds(cov_model, input_date):
 
     cloud = WordCloud(background_color='white',
                       width=2500,
-                      height=2500,
+                      height=1800,
                       max_words=20,
                       colormap='tab10',
                       color_func=lambda *args, **kwargs: cols[i],
@@ -39,7 +39,7 @@ def create_word_clouds(cov_model, input_date):
 
     logger.info("Topics object will contain the top significant terms associated with each topic.")
 
-    fig, axes = plt.subplots(n_topics, figsize=(25,25), sharex=True, sharey=True)
+    fig, axes = plt.subplots(n_topics, figsize=(10,10), sharex=True, sharey=True)
 
     logger.info("Return topics for the lda model in a word cloud.")
     

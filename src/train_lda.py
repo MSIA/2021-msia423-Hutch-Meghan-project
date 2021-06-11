@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
 
 # function to evaluate number of topics
-def topic_eval(doc_clean, doc_term_matrix, dictionary, top_k, input_date):
+def topic_eval(doc_clean, doc_term_matrix, dictionary, top_k, input_date, random_state, coherence_score_method):
     """Evaluate the number of topics (k) to choose via the highest coherence score.
     
     Args: 
@@ -21,6 +21,8 @@ def topic_eval(doc_clean, doc_term_matrix, dictionary, top_k, input_date):
         dictionary: corpora.dictionary - dictionary mapping each term to it's integer id.
         top_k: int - max number of topics to test.
         input_date: str - date that the user selected to subset the data.
+        random_state: int - integer to set the random to.
+        coherence: str - select coherence score from gensim methods.
     
     Return: 
         lda_results: dataframe - of scores from the k topic evaluation
@@ -32,9 +34,9 @@ def topic_eval(doc_clean, doc_term_matrix, dictionary, top_k, input_date):
     
     for t in range(4, top_k):
         
-        cov_model = LdaModel(corpus = doc_term_matrix, id2word = dictionary, num_topics = t, random_state=66826)
+        cov_model = LdaModel(corpus=doc_term_matrix, id2word=dictionary, num_topics=t, random_state=random_state)
 
-        cm = CoherenceModel(model=cov_model, dictionary=dictionary, texts=doc_clean, coherence='c_v')
+        cm = CoherenceModel(model=cov_model, dictionary=dictionary, texts=doc_clean, coherence=coherence_score_method)
         score = cm.get_coherence()
         tup = t, score
         results.append(tup)
@@ -157,7 +159,7 @@ def create_topics_table(doc_topic_df, input_date):
     
     return(top_tweets)
 
-def train_lda(doc_clean, doc_term_matrix, dictionary, top_k, input_date, tweet_df):
+def train_lda(doc_clean, doc_term_matrix, dictionary, top_k, input_date, tweet_df, random_state, coherence_score_method):
     """Train the lda model on the max K found during topic evaluation.
     
     Args: 
@@ -167,6 +169,8 @@ def train_lda(doc_clean, doc_term_matrix, dictionary, top_k, input_date, tweet_d
         top_k: int - max number of topics to test.
         input_date: str - date that the user selected to subset the data.
         tweet_df: dataframe - original dataframe of tweets.
+        random_state: int - integer to set the random to.
+        coherence_score_method - str - method to calculate gensim score. 
     
     Return: 
         max_k: int - integer indicating optimal number of k topics.
@@ -176,7 +180,7 @@ def train_lda(doc_clean, doc_term_matrix, dictionary, top_k, input_date, tweet_d
     """
     
     # evaluate best k topics
-    lda_results = topic_eval(doc_clean, doc_term_matrix, dictionary, top_k, input_date)
+    lda_results = topic_eval(doc_clean, doc_term_matrix, dictionary, top_k, input_date, random_state, coherence_score_method)
     
     # save plots
     s = pd.Series(lda_results.score.values, index=lda_results.topic.values)
@@ -193,7 +197,7 @@ def train_lda(doc_clean, doc_term_matrix, dictionary, top_k, input_date, tweet_d
     logger.info("%s is the optimal k", max_k)
     
     # train model with optimal k
-    cov_model = LdaModel(corpus = doc_term_matrix, id2word = dictionary, num_topics = max_k, random_state=66826)
+    cov_model = LdaModel(corpus = doc_term_matrix, id2word = dictionary, num_topics = max_k, random_state=random_state)
     
     # save trained model object
     logger.debug("Save trained LDA object.")
