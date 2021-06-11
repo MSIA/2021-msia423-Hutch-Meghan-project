@@ -147,7 +147,8 @@ source s3configs.txt
 To download data, ensure that you enter your ```lastname``` and ```firstname``` in the indicated line of code:
 
 ```bash
-docker run --mount type=bind,source="$(pwd)"/data,target=/app/data -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY msia423 run.py --connect_type='download' --s3path='s3://2021-msia423-lastname-firstname/data/external/constructs.csv' --s3='s3'
+docker run --mount type=bind,source="$(pwd)"/data,target=/app/data -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY msia423 run.py --connect_type='download' --s3path='s3://2021-msia423-lastname-firstname/data/tweets.csv' --local_path='data/external/constructs.csv' --s3='s3'
+
 ```
 
 ### 2b) Upload data into S3
@@ -157,7 +158,7 @@ The following docker command uploads the data into a user's S3 Bucket.
 Ensure that you enter your ```lastname``` and ```firstname``` in the indicated line of code:
 
 ```
-docker run --mount type=bind,source="$(pwd)"/data,target=/app/data -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY msia423 run.py --connect_type='download' --s3path='s3://2021-msia423-lastname-firstname/data/sample_tweets.csv' --local_path='data/external/constructs.csv' --s3='s3'
+docker run --mount type=bind,source="$(pwd)"/data,target=/app/data -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY msia423 run.py --connect_type='upload' --s3path='s3://2021-msia423-lastname-firstname/data/tweets.csv' --local_path='data/external/constructs.csv' --s3='s3'
 ```
 
 ### 3. Generate database table
