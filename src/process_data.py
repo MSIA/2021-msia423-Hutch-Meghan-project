@@ -16,6 +16,7 @@ from gensim.models.coherencemodel import CoherenceModel
 import logging.config
 
 nltk.download('punkt')
+nltk.download('wordnet')
 
 # configure logger
 logger = logging.getLogger(__name__)

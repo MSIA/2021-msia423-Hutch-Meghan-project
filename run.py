@@ -35,6 +35,7 @@ import logging.config
 import config.config as config
 
 nltk.download('punkt')
+nltk.download('wordnet')
 
 
 # configure logging
