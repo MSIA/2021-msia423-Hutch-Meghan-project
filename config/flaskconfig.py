@@ -3,7 +3,7 @@ DEBUG = True
 LOGGING_CONFIG = "config/logging.conf"
 PORT = 5000
 APP_NAME = "lda-tweets"
-SQLALCHEMY_TOPICS_MODIFICATIONS = True
+SQLALCHEMY_TOPIC_MODIFICATIONS = True
 HOST = "0.0.0.0"
 SQLALCHEMY_ECHO = False  # If true, SQL for queries made will be printed
 MAX_ROWS_SHOW = 100
@@ -24,3 +24,4 @@ else:
     SQLALCHEMY_DATABASE_URI = '{dialect}://{user}:{pw}@{host}:{port}/{db}'.format(dialect=DB_DIALECT, user=DB_USER,
                                                                                   pw=DB_PW, host=DB_HOST, port=DB_PORT,
                                                                                   db=DATABASE)
+    
