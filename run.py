@@ -3,6 +3,7 @@ import argparse
 import re
 
 import logging
+import yaml
 import random
 import pandas as pd
 import numpy as np
@@ -21,12 +22,14 @@ from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from flask_sqlalchemy import SQLAlchemy
+from sklearn.model_selection import train_test_split
 
 
 from src.process_data import load_tweet_data, remove_duplicates, format_dates, timeframe, clean_text, create_dictionary
 from src.train_lda import topic_eval, get_max_k, get_doc_topic_matrix, create_topics_table, train_lda
 from src.viz_topics import create_word_clouds
-from src.add_topics_db import create_db, topics
+from src.add_topics_db import create_db, Topics
+from src.s3_upload import parse_s3, connect_s3
 import logging.config
 import config.config as config
 
@@ -34,8 +37,9 @@ import config.config as config
 logging.config.fileConfig(config.LOGGING_CONFIG)
 logger = logging.getLogger(__name__)
 
-from src.add_topics_db import create_db, topics
-from src.s3_upload import parse_s3, connect_s3
+# load and parse yaml file.
+a_yaml_file = open("config/model-meta.yaml")
+config = yaml.load(a_yaml_file, Loader=yaml.FullLoader)
 
 # define variables to connect to mysql
 conn_type = "mysql+pymysql"
@@ -54,7 +58,7 @@ if __name__ == '__main__':
                         help="If used, will download data from S3")
     parser.add_argument('--connect_type', default='download', 
                         help="If used, will download data from S3")
-    parser.add_argument('--s3path', default='s3://2021-msia423-Hutch-Meghan/tweets.csv',
+    parser.add_argument('--s3path', default='s3://2021-msia423-Hutch-Meghan/data/tweets.csv',
                         help="If used, upload data to the specified s3 path")
     parser.add_argument('--local_path', default='data/tweet.csv',
                         help="Where to load data to in S3")
@@ -93,11 +97,7 @@ if __name__ == '__main__':
         # Process data
         tweet_data = load_tweet_data(data_path = 'data/external/constructs.csv')
         logger.debug("Randomly sample rows to reduce dataframe and speed up modeling.")
-        #np.random.seed(66826)
-        #chosen_idx = np.random.choice(len(tweet_data), replace=False, size=25000)
-        #tweet_data = tweet_data.sample(n=25000 random_state=66826)
-        from sklearn.model_selection import train_test_split
-        train, tweet_data = train_test_split(tweet_data, test_size=0.005, random_state=66826)
+        train, tweet_data = train_test_split(tweet_data, test_size=config['process_data']['sample_data']['test_size'], random_state=config['process_data']['sample_data']['random_state'])
         
         logger.info("Dataframe sampled with %s rows", len(tweet_data))
         tweet_data = remove_duplicates(tweet_data)
@@ -106,14 +106,14 @@ if __name__ == '__main__':
         # Run First Analysis.
         logger.info("Running first analysis.")
 
-        tweet_data_subset, input_date = timeframe(tweet_data_formatted, input_date = '2020-01-15')
+        tweet_data_subset, input_date = timeframe(tweet_data_formatted, input_date = config['process_data']['timeframe']['time_frame1'])
         logging.info("Length of time sliced dataframe is %s rows", len(tweet_data_subset))
 
         doc_clean = [clean_text(tweets, stop_words_list, exclude, lemma).split() for tweets in tweet_data_subset['read_text_clean2']]
 
         dictionary, doc_term_matrix = create_dictionary(doc_clean)
 
-        max_k, cov_model, coherence_score, doc_topic_df, top_tweets, input_date = train_lda(doc_clean, doc_term_matrix, dictionary, top_k = 10, input_date = '2020-01-15', tweet_df = tweet_data_subset)
+        max_k, cov_model, coherence_score, doc_topic_df, top_tweets, input_date = train_lda(doc_clean, doc_term_matrix, dictionary, top_k = config['tune_model']['k_topics'], input_date = config['process_data']['timeframe']['time_frame1'], tweet_df = tweet_data_subset)
 
         ## visualize model 
         create_word_clouds(cov_model, input_date)
@@ -128,14 +128,14 @@ if __name__ == '__main__':
 
         # Run Second Analysis
         logger.info("Running second analysis.")
-        tweet_data_subset, input_date = timeframe(tweet_data_formatted, input_date = '2020-03-01')
+        tweet_data_subset, input_date = timeframe(tweet_data_formatted, input_date = config['process_data']['timeframe']['time_frame2'])
         logging.info("Length of time sliced dataframe is %s rows", len(tweet_data_subset))
 
         doc_clean = [clean_text(tweets, stop_words_list, exclude, lemma).split() for tweets in tweet_data_subset['read_text_clean2']]
 
         dictionary, doc_term_matrix = create_dictionary(doc_clean)
 
-        max_k, cov_model, coherence_score, doc_topic_df, top_tweets, input_date = train_lda(doc_clean, doc_term_matrix, dictionary, top_k = 10, input_date = '2020-03-01', tweet_df = tweet_data_subset)
+        max_k, cov_model, coherence_score, doc_topic_df, top_tweets, input_date = train_lda(doc_clean, doc_term_matrix, dictionary, top_k = config['tune_model']['k_topics'], input_date = config['process_data']['timeframe']['time_frame2'], tweet_df = tweet_data_subset, random_state = config['train_model']['random_state'], config['tune_model']['coherence_score_method'])
 
         ## visualize model 
         create_word_clouds(cov_model, input_date)
