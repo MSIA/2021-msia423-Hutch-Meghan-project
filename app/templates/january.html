@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <h2>
+         <a href = "{{ url_for('march') }}">Temporal COVID-19 Phenotypes</a>
+    </h2>
+    <br>
+    <h3>
+        <p> January 2020 Topics</p>
+    </h3>
+    <br>
+    
+    <p style="text-align:left"><b>Coherence Scores by k Topics</b></p>
+
+<form class = "ey" method="POST" action="{{ url_for('january') }}"> <!-- note action -->
+    <img src="{{ url_for('static', filename='2020-01-15_k_topics.png') }}"/>
+</form>
+    
+    <p style="text-align:left"><b>Word Clouds for Each Topic</b></p>
+    
+<form class = "ey" method="POST" action="{{ url_for('january') }}"> <!-- note action -->
+    <img src="{{ url_for('static', filename='word_cloud_2020-01-15.png') }}"/>
+</form>
+
+</body>
+</html>

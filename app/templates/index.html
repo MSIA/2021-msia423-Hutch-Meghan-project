@@ -2,42 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link href="static/basic.css" rel="stylesheet">
 </head>
 
 <body>
+    <h2>
+         <a href = "{{ url_for('index') }}">Temporal COVID-19 Phenotypes</a>
+    </h2>
     <h3>
-         <a href = "{{ url_for('index') }}">Penny Lane Music Recommender</a>
+         <a href = "{{ url_for('index') }}">Select a time period during 2020:</a>
     </h3>
 
-    <hr/>
-    <table>
-         <thead>
-            <tr>
-               <th>Title</th>
-               <th>Artist</th>
-               <th>Album</th>
-            </tr>
-         </thead>
-
-         <tbody>
-            {% for track in tracks %}
-               <tr>
-                   <td>{{ track.title }}</td>
-                   <td>{{ track.artist }}</td>
-                   <td>{{ track.album }}</td>
-               </tr>
-            {% endfor %}
-         </tbody>
-      </table>
-      <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
-      <dl>
-        <input type=text size=15 name=title placeholder="Title">
-        <input type=text size=15 name=artist placeholder="Artist">
-        <input type=text size=15 name=album placeholder="Album">
-        <input type=submit value=Add>
-      </dl>
-    </form>
+   
+<form class = "form-group" method="POST" action="{{ url_for('submit') }}"> <!-- note action -->
+    <div class="form-group">
+    <select name="selectDate"> <!-- note the name -->
+        <option value="None">Select Date</option>
+        <option value="January">January</option>
+        <option value="March">March</option>
+    </select>
+    <input type="submit" value="Submit" class="btn" />
+    </div>
+</form>
 
 </body>
 </html>
